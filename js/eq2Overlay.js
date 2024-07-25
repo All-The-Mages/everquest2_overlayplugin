@@ -101,7 +101,7 @@ var combatants = {
         while (this.table.rows[1]) this.table.deleteRow(1)
     },
     update: function (data) {
-        var combatData = sortCombatData(combatantDataSet(data))
+        var combatData = sortCombatData(mergePets(combatantDataSet(data)))
         var maxSortValue = combatData[0] ? parseInt(combatData[0][sortBy]) : 1
 
         combatData.forEach(function (row) {
