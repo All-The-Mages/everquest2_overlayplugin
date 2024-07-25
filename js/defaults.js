@@ -1,5 +1,9 @@
 var unitsInChart = 8
 
+// Working sortBy options right now are "damage", "healed", and "damagetaken"
+var sortBy = "damage"
+var sortDesc = true
+
 var encounterMetrics = {
     "Encounter": "title",
     "Duration": "duration",
@@ -16,8 +20,9 @@ var combatantsMetrics = {
     "Crit%": "crithit%",
 }
 
-var colorSeed = 127
+var colorSeed = 0
 
 var colorOverrides = {
-    "Tristol": "00aaff"
+    "Yourname": "cc0044",
+    "Wizard01": "00aaff",
 }

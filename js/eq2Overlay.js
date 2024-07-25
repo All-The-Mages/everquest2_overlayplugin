@@ -17,31 +17,8 @@ function update(data) {
 
 }
 
-function percentToInt(percent) {
-    return parseInt(percent.replace(/^\%+|\%+$/g, ''))
-}
-
-function combatantDataSet(data) {
-    var dataSet = []
-    var count = 0
-    var maxPercent = 100
-    for (let key in data) {
-        if (count++ <= unitsInChart & data.hasOwnProperty(key)) {
-            if (count == 1) {
-                maxPercent = percentToInt(data[key]["damage%"])
-                if (maxPercent < 80) { maxPercent = maxPercent + 10 }
-            }
-            var curPercent = percentToInt(data[key]["damage%"])
-            data[key].displayPercent = Math.trunc((curPercent / maxPercent) * 100)
-            dataSet.push(data[key])
-        }
-    }
-
-    return dataSet
-}
-
 function makeHeader(metrics, tr) {
-    for (let key in metrics) {
+    for (var key in metrics) {
         if (metrics.hasOwnProperty(key)) {
             var th = document.createElement("th")
             th.innerText = key
@@ -54,7 +31,7 @@ function makeHeader(metrics, tr) {
 function makeRow(metrics, data) {
     var tr = document.createElement("tr")
 
-    for (let key in metrics) {
+    for (var key in metrics) {
         if (metrics.hasOwnProperty(key)) {
             var td = document.createElement("td")
             td.innerText = data[metrics[key]]
@@ -124,10 +101,12 @@ var combatants = {
         while (this.table.rows[1]) this.table.deleteRow(1)
     },
     update: function (data) {
-        var combatData = combatantDataSet(data)
+        var combatData = sortCombatData(combatantDataSet(data))
+        var maxSortValue = combatData[0] ? parseInt(combatData[0][sortBy]) : 1
+
         combatData.forEach(function (row) {
             var tr = makeRow(this.metrics, row)
-            tr.style.background = barBackground(row["name"], row["displayPercent"])
+            tr.style.background = barBackground(row["name"], Math.trunc((parseInt(row[sortBy]) / maxSortValue) * 100))
             this.table.appendChild(tr)
         }, this)
     },
