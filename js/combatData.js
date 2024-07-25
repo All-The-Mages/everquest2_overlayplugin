@@ -14,6 +14,52 @@ function sortCombatData(data) {
     return data
 }
 
+function extractPets(combatData) {
+    var pets = []
+
+    for (var i = combatData.length - 1; i >= 0; i--) {
+        if (combatData[i].name.includes("'s ")) {
+            pets.push(combatData[i])
+            combatData.splice(i, 1);
+        }
+    }
+
+    return { pets, combatData }
+}
+
+function mergePets(combatData) {
+    var data = extractPets(combatData)
+
+    var pets = data.pets.map((pet) => {
+        pet.owner = pet.name.substring(0, pet.name.indexOf("'s "))
+        return pet
+    })
+
+    return data.combatData.map((unit) => {
+        var unitPets = pets.filter((pet) => { return pet.owner == unit.name })
+        unitPets.forEach((pet) => {
+            unit = mergeCombants(unit, pet)
+        })
+
+        return unit
+    })
+}
+
+function mergeCombants(primaryUnit, secondaryUnit) {
+    var merged = {}
+
+    for (var key in primaryUnit) {
+        if (primaryUnit.hasOwnProperty(key)) {
+            if (mergeUnitFuncs[key]) {
+                merged[key] = mergeUnitFuncs[key](primaryUnit[key], secondaryUnit[key])
+            } else {
+                merged[key] = primaryUnit[key]
+            }
+        }
+    }
+    return merged
+}
+
 var mergeUnitFuncs = {
     "damage": mergeInt,
     "damage-m": mergeFloat,
