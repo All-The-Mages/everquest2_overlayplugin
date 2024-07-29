@@ -123,6 +123,7 @@ function mergeFloat(str1, str2) {
 }
 
 function shorthandToInt(str) {
+    if (typeof (str) != "string") { return 0 }
     if (str.includes("B")) {
         return parseFloat(str) * 1000000000
     } else if (str.includes("M")) {
