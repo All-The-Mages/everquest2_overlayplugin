@@ -10,7 +10,8 @@ function combatantDataSet(data) {
 }
 
 function sortCombatData(data) {
-    data.sort((a, b) => { return (parseInt(a[sortBy]) - parseInt(b[sortBy])) * (sortDesc ? -1 : 1) })
+    if (typeof toNumberUnitFuncs[sortBy] == 'undefined') { return data }
+    data.sort((a, b) => { return (toNumberUnitFuncs[sortBy](a[sortBy]) - toNumberUnitFuncs[sortBy](b[sortBy])) * (sortDesc ? -1 : 1) })
     return data
 }
 
@@ -58,6 +59,56 @@ function mergeCombants(primaryUnit, secondaryUnit) {
         }
     }
     return merged
+}
+
+var toNumberUnitFuncs = {
+    "damage": toNumber,
+    "damage-m": toNumber,
+    "damage-b": toNumber,
+    "damage-*": shorthandToInt,
+    "DAMAGE-k": toNumber,
+    "DAMAGE-m": toNumber,
+    "DAMAGE-b": toNumber,
+    "DAMAGE-*": toNumber,
+    "damage%": toNumber,
+    "dps": toNumber,
+    "dps-*": toNumber,
+    "DPS": toNumber,
+    "DPS-k": toNumber,
+    "DPS-m": toNumber,
+    "DPS-*": toNumber,
+    "encdps": toNumber,
+    "encdps-*": toNumber,
+    "ENCDPS": toNumber,
+    "ENCDPS-k": toNumber,
+    "ENCDPS-m": toNumber,
+    "ENCDPS-*": toNumber,
+    "hits": toNumber,
+    "crithits": toNumber,
+    "misses": toNumber,
+    "hitfailed": toNumber,
+    "swings": toNumber,
+    "tohit": toNumber,
+    "TOHIT": toNumber,
+    "healed": toNumber,
+    "healed%": toNumber,
+    "enchps": toNumber,
+    "enchps-*": toNumber,
+    "ENCHPS": toNumber,
+    "ENCHPS-k": toNumber,
+    "ENCHPS-m": toNumber,
+    "ENCHPS-*": toNumber,
+    "critheals": toNumber,
+    "heals": toNumber,
+    "cures": toNumber,
+    "powerdrain": toNumber,
+    "powerdrain-*": shorthandToInt,
+    "powerheal": toNumber,
+    "powerheal-*": shorthandToInt,
+    "kills": toNumber,
+    "overHeal": toNumber,
+    "damageShield": toNumber,
+    "absorbHeal": toNumber
 }
 
 var mergeUnitFuncs = {
@@ -110,28 +161,32 @@ var mergeUnitFuncs = {
     "absorbHeal": mergeInt
 }
 
+function toNumber(str) {
+    return parseFloat(str) || 0
+}
+
 function mergeInt(str1, str2) {
-    return (parseInt(str1) + parseInt(str2))
+    return ((parseInt(str1) || 0) + (parseInt(str2) || 0))
 }
 
 function mergePercent(str1, str2) {
-    return `${(parseInt(str1) + parseInt(str2))}%`
+    return `${mergeInt(str1, str2)}%`
 }
 
 function mergeFloat(str1, str2) {
-    return (parseFloat(str1) + parseFloat(str2))
+    return (toNumber(str1) + toNumber(str2))
 }
 
 function shorthandToInt(str) {
     if (typeof (str) != "string") { return 0 }
     if (str.includes("B")) {
-        return parseFloat(str) * 1000000000
+        return toNumber(str) * 1000000000
     } else if (str.includes("M")) {
-        return parseFloat(str) * 1000000
+        return toNumber(str) * 1000000
     } else if (str.includes("K")) {
-        return parseFloat(str) * 1000
+        return toNumber(str) * 1000
     }
-    return parseFloat(str)
+    return toNumber(str)
 }
 
 function intToShorthand(int) {
